@@ -10,6 +10,7 @@
 - [Inspired By](#inspired-by)
 - [Acceptance Criteria](#acceptance-criteria)
 
+
 ## User Story
 ``` 
  AS A traveler
