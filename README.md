@@ -32,7 +32,7 @@ SO THAT I can plan a trip accordingly
 - Javascript
 
 ## Status
-- Project incomplete as of February 4th
+- Project incomplete as of February 7th
 
 ## Inspired By 
 - Tech Coding Bootcamp homework 6 
