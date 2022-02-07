@@ -1,17 +1,85 @@
 // Weather App: 
 
-// //Search 
-// Function: Event Handler
-// 1. Read value from the textbox into a variable 
-// 2. Creat URL for fetch
-// 3. Fetch results
-// 4. Call function to update after results
+var cities = [];
+
+var cityFormEl=document.querySelector("#city-search-form");
+var cityInputEl=document.querySelector("#city");
+var weatherContainerEl=document.querySelector("#current-weather-container");
+var citySearchInputEl = document.querySelector("#searched-city");
+var forecastTitle = document.querySelector("#forecast");
+var forecastContainerEl = document.querySelector("#fiveday-container");
+var pastSearchButtonEl = document.querySelector("#past-search-buttons");
+//Find a way to slip these into the functions themselves? Less global variables
+var saveSearch = function(){
+    localStorage.setItem("cities", JSON.stringify(cities));
+};
+
+var getCityWeather = function(city){
+    var apiKey = "844421298d794574c100e3409cee0499"
+    var apiURL = `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=imperial&appid=${apiKey}`
+
+    fetch(apiURL)
+    .then(function(response){
+        response.json().then(function(data){
+            displayWeather(data, city);
+        });
+    });
+};
+
+var formSubmitHandler = function(event){
+    event.preventDefault();
+    var city = cityInputEl.value.trim();
+    if (city) {
+        getCityWeather(city);
+        get5Day(city);
+        cities.unshift({city});
+        cityInputEl.value= " ";
+    } else {
+        alert("Please enter a city!")
+    }
+    saveSearch();
+    pastSearchButtonEl(city);
+}
 
 // Function: DoResults
 // 1. Call function AddSearchTermtoResults
 // 2. Call function AddTodaysResults
 // 3. Call function Add5DayResults
 // 4. Clear textbox
+
+var displayWeather = function(weather, searchCity){
+    weatherContainerEl.textContent=" ";
+    citySearchInputEl.textContent=searchCity;
+    console.log(weather);
+
+    //Create Date element
+    var currentDate = document.createElement("span")
+    currentDate.textContent=" (" + moment(weather.dt.value).format("MMM D, YYYY") + ") ";
+    citySearchInputEl.appendChild(currentDate);
+
+    //creating image element 
+    var weatherIcon = document.createElement("img")
+    weatherIcon.setAttribute("src", `https://openweathermap.org/img/wn/${weather.weather[0].icon}@2x.png`)
+    citySearchInputEl.appendChild(weatherIcon);
+
+    //create a span to hold temp data
+    var tempEl = document.createElement("span")
+    tempEl.textContent= "Temperature: " + weather.main.temp + " °F";
+    tempEl.classList = "list-group-item"
+
+    //create a span to hold humidity data 
+    var humidityEl = document.createElement("span")
+    humidityEl.textContent= "Humidity: " + weather.main.humidity + "%";
+    humidityEl.classList = "list-group-item";
+
+    //create a span to hold wind index
+    var windEl = document.createElement("span")
+    windEl.textContent= "Wind Speed: " + weather.wind.speed + "MPH";
+    windEl.classList = "list-group-item";
+
+
+
+}
 
 
 // //Recent Searches
