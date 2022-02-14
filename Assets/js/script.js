@@ -10,21 +10,6 @@ var forecastTitle = document.querySelector("#forecast");
 var forecastContainerEl = document.querySelector("#fiveday-container");
 var pastSearchButtonEl = document.querySelector("#past-search-buttons");
 //Find a way to slip these into the functions themselves? Less global variables
-var saveSearch = function(){
-    localStorage.setItem("cities", JSON.stringify(cities));
-};
-
-var getCityWeather = function(city){
-    var apiKey = "8b59dbc3208e6ab628c932c0dbe224fb"
-    var apiURL = `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=imperial&appid=${apiKey}`
-
-    fetch(apiURL)
-    .then(function(response){
-        response.json().then(function(data){
-            displayWeather(data, city);
-        });
-    });
-};
 
 var formSubmitHandler = function(event){
     event.preventDefault();
@@ -41,16 +26,27 @@ var formSubmitHandler = function(event){
     pastSearchButtonEl(city);
 }
 
-// Function: DoResults
-// 1. Call function AddSearchTermtoResults
-// 2. Call function AddTodaysResults
-// 3. Call function Add5DayResults
-// 4. Clear textbox
+var saveSearch = function(){
+    localStorage.setItem("cities", JSON.stringify(cities));
+};
+
+var getCityWeather = function(city){
+    var apiKey = "8b59dbc3208e6ab628c932c0dbe224fb"
+    var apiURL = `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=imperial&appid=${apiKey}`
+
+    fetch(apiURL)
+    .then(function(response){
+        response.json().then(function(data){
+            displayWeather(data, city);
+        });
+    });
+};
 
 var displayWeather = function(weather, searchCity){
     weatherContainerEl.textContent=" ";
     citySearchInputEl.textContent=searchCity;
-    console.log(weather);
+
+    //console.log(weather);
 
     //Create Date element
     var currentDate = document.createElement("span")
@@ -98,31 +94,121 @@ var getUvIndex = function(lat,lon){
     .then(function(response){
         response.json().then(function(data){
             displayUvIndex(data)
-            console.log(data);
+            //console.log(data);
         });
     });
-    console.log(lon);
-    console.log(lat);
+    //console.log(lon);
+    //console.log(lat);
+}
+
+var displayUvIndex = function(index){
+    var uvIndexEl = document.createElement("div");
+    uvIndexEl.textContent = "UV Index: "
+    uvIndexEl.classList = "list-group-item"
+
+    uvIndexValue = document.createElement("span")
+    uvIndexValue.textContent = index.value
+
+    if(index.value <=2){
+        uvIndexValue.classList = "favorable"
+    }else if(index.value >2 && index.value<=8){
+        uvIndexValue.classList = "moderate "
+    }
+    else if(index.value >8){
+        uvIndexValue.classList = "severe"
+    };
+
+    uvIndexEl.appendChild(uvIndexValue);
+
+    //append index to current weather
+    weatherContainerEl.appendChild(uvIndexEl);
+}
+
+var get5Day = function(city){
+    var apiKey = "8b59dbc3208e6ab628c932c0dbe224fb"
+    var apiURL = 'https://api.openweathermap.org/data/2.5/forecast?q=${city}&units=imperial&appid=${apiKey}'
+
+    fetch(apiURL)
+    .then(function(response){
+        response.json().then(function(data){
+            display5Day(data);
+        });
+    });
+};
+
+var display5Day = function(weather){
+    forecastContainerEl.textContent = ""
+    forecastTitle.textContent = "5 Day Forecast:";
+
+    var forecast = weather.list;
+    for (var i=5; i < forecast.length; i=i+8){
+        var dailyForecast = forecast[i];
+
+        var forecastEl = document.createElement("div");
+        forecastEl.classList = "card bg-primary text-light m-2";
+
+        //console.log(dailyForecast)
+
+        //create date element
+        var forecastDate = document.createElement("h5")
+        forecastDate.textContent = moment.unix(dailyForecast.dt).format("MMM D, YYYY");
+        forecastDate.classList = "card-header text-center"
+        forecastEl.appendChild(forecastDate);
+
+        //image el
+        var weatherIcon = document.createElement("img")
+        weatherIcon.classList = "card-body text-center";
+        weatherIcon.setAttribute("src",`https://openweathermap.org/img/wn/${dailyForecast.weather[0].icon}@2x.png`);
+
+        //append
+        forecastEl.appendChild(weatherIcon);
+
+        //temp span
+        var forecastTempEl = document.createElement("span");
+        forecastTempEl.classList = "card-body text-center";
+        forecastTempEl.textContent = dailyForecast.main.temp + " °F";
+
+        //append
+        forecastEl.appendChild(forecastTempEl)
+
+        //humidity span
+        var forecastHumEl = document.createElement("span");
+        forecastHumEl.classList = "card-body text-center";
+        forecastHumEl.textContent = dailyForecast.main.humidity + " %";
+
+        //append 
+        forecastEl.appendChild(forecastHumEl);
+
+        //append to 5day container
+        forecastContainerEl.appendChild(forecastEl);
+    }
 }
 
 
-// //Recent Searches
-// Function: AddSearchTermtoResults
-// //Parameter in Search Term
-// 1. Add a button to the screen with a data attribute that stores the search terms
+// Recent Searches
+var pastSearch = function(pastSearch){
 
-// Function: Event Listener
-// 1. Read the data attribute to get the search term. 
-// 2. Call search function 
+    //console.log(pastSearch)
 
-// //Results Today
-// Function: AddToday'sResults
+    pastSearchEl = document.createElement("button");
+    pastSearchEl.textContent = pastSearch;
+    pastSearchEl.classList = "d-flex w-100 btn-light border p-2";
+    pastSearchEl.setAttribute("data-city", pastSearch)
+    pastSearchEl.setAttribute("type", "submit");
 
-// //Results 5Days
-// Function: Add 5day results
+    pastSearchButtonEl.prepend(pastSearchEl);
+}
 
-// 1. 
+var pastSearchHandler = function(event){
+    var city = event.target.getAttribute("data-city")
+    if(city){
+        getCityWeather(city);
+        get5Day(city);
 
-//Results today
+    }
+}
 
-//Results 5 Days
+pastSearch()
+//Event Listener
+cityFormEl.addEventListener("submit", formSubmitHandler);
+pastSearchButtonEl.addEventListener("click", pastSearchHandler);

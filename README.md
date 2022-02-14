@@ -19,6 +19,7 @@ SO THAT I can plan a trip accordingly
 ```
 
 ## General Information
+A simple yet effective weather app designed to be easier for the user to interact with and find out weather patterns 
 
 ## Website 
 [Check out my weather dashboard here!](https://laurenagra.github.io/Weather-Dashboard/)
