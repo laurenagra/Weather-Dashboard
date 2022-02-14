@@ -23,7 +23,7 @@ var formSubmitHandler = function(event){
         alert("Please enter a city!")
     }
     saveSearch();
-    pastSearchButtonEl(city);
+    pastSearch(city);
 }
 
 var saveSearch = function(){
@@ -74,13 +74,13 @@ var displayWeather = function(weather, searchCity){
     windEl.classList = "list-group-item";
 
       //append to container
-   weatherContainerEl.appendChild(temperatureEl);
+   weatherContainerEl.appendChild(tempEl);
 
    //append to container
    weatherContainerEl.appendChild(humidityEl);
 
    //append to container
-   weatherContainerEl.appendChild(windSpeedEl);
+   weatherContainerEl.appendChild(windEl);
 
    var lat = weather.coord.lat;
    var lon = weather.coord.lon;
@@ -125,8 +125,8 @@ var displayUvIndex = function(index){
 }
 
 var get5Day = function(city){
-    var apiKey = "8b59dbc3208e6ab628c932c0dbe224fb"
-    var apiURL = 'https://api.openweathermap.org/data/2.5/forecast?q=${city}&units=imperial&appid=${apiKey}'
+    var apiKey = "0adfafad5142cec31db55941da540863"
+    var apiURL = 'https://api.openweathermap.org/data/2.5/forecast?lat={lat}&lon={lon}&appid={API key}'
 
     fetch(apiURL)
     .then(function(response){
